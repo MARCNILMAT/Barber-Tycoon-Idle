@@ -278,39 +278,142 @@ html, body {
 
 .chair-emoji { font-size: 2.4rem; }
 
-/* Barber + Client container */
-.chair-scene {
+/* CSS ART - BARBEARIA */
+.art-scene {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  margin: 10px 0;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-height: 80px;
   justify-content: center;
 }
 
-.barber-character {
-  font-size: 2rem;
-  animation: bob 1.5s ease-in-out infinite;
-  display: none;
+/* Barber Base */
+.art-barber {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1; /* Atrás da cadeira */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: opacity 0.3s;
 }
-.chair-card.active .barber-character { display: block; }
+.chair-card.empty .art-barber { opacity: 0.3; }
 
-@keyframes bob {
+.art-barber-head { font-size: 2.5rem; position: relative; z-index: 2; animation: floatHead 3s ease-in-out infinite; }
+@keyframes floatHead {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-3px); }
 }
 
-.client-character {
-  font-size: 1.4rem;
+.art-barber-body {
+  width: 44px; height: 50px;
+  background: var(--bg-card2);
+  border: 1px solid var(--border-bright);
+  border-radius: 20px 20px 8px 8px;
+  margin-top: -12px;
+  z-index: 1;
+  box-shadow: inset 0 -10px 15px rgba(0,0,0,0.5);
+}
+
+.art-barber-arm {
+  position: absolute;
+  top: 25px;
+  right: -25px;
+  font-size: 2rem;
+  transform-origin: bottom left;
+  transform: rotate(15deg);
+  z-index: 4; /* Acima do cliente */
+}
+
+/* Animação da tesoura cortando */
+@keyframes cutMotion {
+  0% { transform: rotate(15deg) translateY(0); }
+  50% { transform: rotate(-30deg) translateY(12px) translateX(-5px); }
+  100% { transform: rotate(15deg) translateY(0); }
+}
+.art-barber.cutting .art-barber-arm { animation: cutMotion 0.4s ease-in-out; }
+.art-barber.cutting.infinite .art-barber-arm { animation: cutMotion 0.8s ease-in-out infinite; }
+
+/* Cadeira de Barbeiro */
+.art-chair {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.chair-back {
+  width: 50px; height: 45px;
+  background: #333;
+  border-radius: 12px 12px 0 0;
+  border: 2px solid #555;
   position: relative;
+}
+.chair-back::after {
+  content: ''; position: absolute;
+  inset: 4px; 
+  background: var(--border-bright);
+  border-radius: 6px 6px 0 0;
+  opacity: 0.4;
+}
+.chair-seat {
+  width: 66px; height: 12px;
+  background: var(--border-bright);
+  border-radius: 4px;
+  z-index: 3;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.6);
+}
+.chair-base {
+  width: 14px; height: 18px;
+  background: linear-gradient(90deg, #555, #999, #444);
+  border-bottom: 4px solid #222;
+}
+
+/* Cliente Sentado */
+.art-client {
+  position: absolute;
+  bottom: 25px; 
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: breath 2.5s ease-in-out infinite;
+}
+@keyframes breath {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(2px); }
+}
+
+.art-client-head { font-size: 2.2rem; position: relative; z-index: 2; }
+.art-client-body {
+  width: 56px; height: 40px;
+  background: var(--bg-deep); /* Cor da capa */
+  border: 1px solid var(--border);
+  border-radius: 28px 28px 0 0;
+  margin-top: -14px;
+  z-index: 1;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 10px 10px rgba(255,255,255,0.05), 0 5px 10px rgba(0,0,0,0.5);
 }
 
 .client-type-label {
   font-size: 0.65rem;
   font-weight: 700;
-  padding: 1px 6px;
-  border-radius: 8px;
+  padding: 2px 8px;
+  border-radius: 10px;
   text-transform: uppercase;
+  position: absolute;
+  bottom: -10px;
+  z-index: 4;
 }
 .client-type-label.vip {
   background: var(--vip-glow);
@@ -322,6 +425,8 @@ html, body {
   color: var(--green);
   border: 1px solid var(--green);
 }
+
+
 
 /* Progress bar */
 .progress-wrap {

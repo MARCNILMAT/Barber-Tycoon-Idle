@@ -549,8 +549,12 @@ const game = {
     const el = document.getElementById(`chair-${chairIdx}`);
     if (el) {
       // Scissors spin effect
-      const sci = el.querySelector('.barber-character');
-      if (sci) { sci.classList.add('scissors-spin'); setTimeout(() => sci.classList.remove('scissors-spin'), 400); }
+      const barber = el.querySelector('.art-barber');
+      if (barber) { 
+        barber.classList.remove('cutting');
+        void barber.offsetWidth; 
+        barber.classList.add('cutting'); 
+      }
     }
 
     const pct = Math.min(chair.progress / chair.timeTotal, 1);
@@ -634,20 +638,35 @@ const game = {
     const autoBarberActive = hasClient && chair.autoBarber;
     const pct = hasClient ? Math.min(chair.progress / chair.timeTotal, 1) * 100 : 0;
     const remaining = hasClient ? Math.max(0, (chair.timeTotal - chair.progress) / 1000).toFixed(1) : '';
-    const canClick = hasClient && !autoBarberActive;
 
     const barberEmojis = ['💇', '💈', '🧑‍🦲'];
     const barberEmoji = i < this.computed.autoBarbers ? '🤖' : barberEmojis[i % barberEmojis.length];
 
+    const sceneHTML = `
+      <div class="art-scene">
+        <div class="art-chair">
+          <div class="chair-back"></div>
+          <div class="chair-seat"></div>
+          <div class="chair-base"></div>
+        </div>
+        <div class="art-barber ${autoBarberActive ? 'cutting infinite' : ''}">
+          <div class="art-barber-head">${barberEmoji}</div>
+          <div class="art-barber-body"></div>
+          <div class="art-barber-arm">✂️</div>
+        </div>
+        ${hasClient ? `
+          <div class="art-client">
+            <div class="art-client-body"></div>
+            <div class="art-client-head">${chair.clientEmoji || '👨'}</div>
+            <div class="client-type-label ${isVIP ? 'vip' : 'normal'}">${isVIP ? '👑 VIP' : 'Normal'}</div>
+          </div>
+        ` : `<div class="empty-chair-indicator" style="position:absolute; bottom:30px; font-size: 0.7rem; color:var(--text-muted); opacity: 0.5;">Vazio</div>`}
+      </div>
+    `;
+
     return `
       <div class="chair-label">Cadeira ${i + 1}${i < this.computed.autoBarbers ? ' 🤖' : ''}</div>
-      <div class="chair-scene">
-        <div class="barber-character">${barberEmoji}</div>
-        ${hasClient ? `
-          <div class="client-character">${chair.clientEmoji || '👨'}</div>
-          <div class="client-type-label ${isVIP ? 'vip' : 'normal'}">${isVIP ? '👑 VIP' : 'Normal'}</div>
-        ` : `<div class="chair-emoji">💺</div>`}
-      </div>
+      ${sceneHTML}
       ${hasClient ? `
         <div class="progress-wrap">
           <div class="progress-bar" style="width:${pct}%"></div>
