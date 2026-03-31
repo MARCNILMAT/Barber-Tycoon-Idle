@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>✂️ Barber Tycoon Idle — Seu Império da Barbearia</title>
+  <meta name="description" content="Jogo idle de barbearia: atenda clientes, contrate barbeiros e construa seu império! Grátis para jogar no navegador." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://game-cdn.poki.com/scripts/v2/poki-sdk.js"></script>
+</head>
+<body>
+
+  <!-- ===== OFFLINE EARNINGS POPUP ===== -->
+  <div id="offlinePopup" class="popup-overlay hidden">
+    <div class="popup-box">
+      <div class="popup-icon">😴</div>
+      <h2>Bem-vindo de volta!</h2>
+      <p>Seus barbeiros trabalharam enquanto você estava fora.</p>
+      <div class="offline-amount" id="offlineAmount">+$0</div>
+      <div class="popup-buttons">
+        <button id="offlineCollect" class="btn-gold">Coletar</button>
+        <button id="offlineDouble" class="btn-ad">
+          📺 Ver Anúncio — Dobrar (2x)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PRESTIGE POPUP ===== -->
+  <div id="prestigePopup" class="popup-overlay hidden">
+    <div class="popup-box prestige-box">
+      <div class="popup-icon">👑</div>
+      <h2>UPGRADE DA BARBEARIA!</h2>
+      <p id="prestigeText">Sua barbearia evoluiu para um novo nível!</p>
+      <button id="prestigeOk" class="btn-gold">🚀 Vamos lá!</button>
+    </div>
+  </div>
+
+  <!-- ===== SKINS MODAL ===== -->
+  <div id="skinsModal" class="popup-overlay hidden">
+    <div class="popup-box modal-large">
+      <div class="modal-header">
+        <h2>🎨 Loja de Skins</h2>
+        <button id="closeSkins" class="btn-close">✖</button>
+      </div>
+      <p class="modal-subtitle">Compre novos visuais para atrair mais gorjetas!</p>
+      <div class="skins-grid" id="skinsGrid">
+        <!-- Skins injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== AD MOCK OVERLAY ===== -->
+  <div id="adOverlay" class="popup-overlay hidden" style="z-index: 9999; background: #000;">
+    <div style="text-align: center; color: white;">
+      <h1 style="margin-bottom: 20px;">📺 Publicidade...</h1>
+      <p>Este é um Mock do SDK Poki.</p>
+      <p>O jogo está pausado por 3 segundos.</p>
+      <div class="mock-progress" style="width: 200px; height: 10px; background: #333; margin: 20px auto; border-radius: 5px; overflow: hidden;">
+        <div id="adProgressBar" style="width: 0%; height: 100%; background: var(--gold); transition: width 3s linear;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <header class="game-header">
+    <div class="header-left">
+      <div class="logo">✂️ BARBER TYCOON</div>
+      <div class="prestige-badge" id="prestigeBadge">🏪 Barbearia Simples</div>
+    </div>
+    <div class="header-right">
+      <div class="header-actions">
+        <button id="btnSkins" class="btn-icon" title="Loja de Skins">🎨</button>
+        <button id="btnSound" class="btn-icon" title="Ligar/Desligar Som">🔊</button>
+      </div>
+      <div class="money-info">
+        <div class="money-display">
+          <span class="money-icon">💵</span>
+          <span id="moneyDisplay">$0</span>
+        </div>
+        <div class="total-earned">
+          <span>Total ganho: </span>
+          <span id="totalEarned">$0</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN GAME AREA ===== -->
+  <main class="game-main">
+
+    <!-- LEFT: BARBERSHOP SCENE -->
+    <section class="barber-scene" id="barberScene">
+
+      <!-- Floating money particles container -->
+      <div id="particles" class="particles-layer"></div>
+
+      <!-- Barbershop background decoration -->
+      <div class="shop-bg">
+        <div class="shop-sign">✂️ BARBEARIA TOP</div>
+        <div class="shop-lights">
+          <span class="light"></span>
+          <span class="light"></span>
+          <span class="light"></span>
+        </div>
+      </div>
+
+      <!-- CHAIRS AREA -->
+      <div class="chairs-area" id="chairsArea">
+        <!-- Chairs injected by JS -->
+      </div>
+
+      <!-- QUEUE AREA -->
+      <div class="queue-section">
+        <div class="queue-label">
+          <span>📋 Fila de Espera</span>
+          <span id="queueCount">0 clientes</span>
+        </div>
+        <div class="queue-area" id="queueArea">
+          <!-- Queue clients injected by JS -->
+        </div>
+      </div>
+
+      <!-- STATS BAR -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-icon">👥</span>
+          <span>Atendidos hoje</span>
+          <span class="stat-value" id="clientsServed">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">⚡</span>
+          <span>$/min</span>
+          <span class="stat-value" id="incomePerMin">$0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">⭐</span>
+          <span>Reputação</span>
+          <span class="stat-value" id="reputation">1</span>
+        </div>
+      </div>
+
+      <!-- BOOST / AD BUTTON -->
+      <div class="boost-section">
+        <button id="btnBoostAd" class="btn-ad-boost">
+          <span class="boost-icon">📺</span> Ativar Boost (2x) por 1min
+        </button>
+      </div>
+
+    </section>
+
+    <!-- RIGHT: UPGRADES PANEL -->
+    <aside class="upgrades-panel">
+
+      <div class="panel-header">
+        <h2>🔼 Upgrades</h2>
+        <div class="multiplier-badge" id="multiplierBadge">x1.0</div>
+      </div>
+
+      <div class="upgrades-list" id="upgradesList">
+        <!-- Upgrades injected by JS -->
+      </div>
+
+      <!-- ACHIEVEMENTS -->
+      <div class="achievements-section">
+        <h3>🏆 Conquistas</h3>
+        <div class="achievements-list" id="achievementsList">
+          <!-- Achievements injected by JS -->
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- ===== BOTTOM TAB BAR (mobile) ===== -->
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-tab="game" id="tabGame">✂️ Barbearia</button>
+    <button class="nav-btn" data-tab="upgrades" id="tabUpgrades">🔼 Upgrades</button>
+    <button class="nav-btn" data-tab="stats" id="tabStats">📊 Stats</button>
+  </nav>
+
+  <!-- ===== TOAST NOTIFICATION ===== -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="game.js"></script>
+</body>
+</html>
